@@ -1,39 +1,54 @@
-# Clinical Genomics Practical: Part 2 Variant Filtering and Pedigree Analyses -Julien Soubrier
-{:.no_toc}
+# Clinical Genomics Practical: Part 2 Variant Filtering and Pedigree Analyses
 
-* TOC
-{:toc}
-### Some backgound
 
-High-throughput sequencing is currently used ubiquitously in identifying the cause of a large range of genetic diseases.
-While single gene and well-known Mendelian genetic disorders, such as sickle-cell anemia, Tay–Sachs disease and cystic fibrosis, can be identified with simple diagnostic techniques, whole genome (WGS) and exome (WES/WXS) sequencing can be used to identify and study a wide variety of inherited traits.
-Cost used to be a barrier for using high-throughput sequencing approaches, but now it is possible to sequence a patient in [under 27 hours for less than ~US$1,000 per sample](https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-015-0221-8). 
 
-The resolution to which variants can be assessed with WGS means that it is also powerful approach to identify new genetic variants that cause disease.
-Using WGS or WES on thousands of samples, we can now establish fine-grained association maps for more and more complex diseases that are likely to be caused by the action of hundreds of genes.
+#### By Evelyn Collen
+(prac repurposed from the excellent Julien Soubrier)
 
-The current clinical workflow works a lot like this:
+## **1. Some background**
 
-![Priest. (2017). _Curr Opin Pediatr_. 29(5): 513–519.](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5590671/bin/nihms899674f1.jpg)
+Last prac, we annotated a bunch of information into a vcf and learnt about the annotating process. Variant filtering (also called variant priorisation) then gets us down to a handful of candidates - and then, if the evidence is strong enough for one of them, we can report that as our diagnostic variant in the variant classification and curation step.
 
-In the previous tutorial, we discussed annotation of identified variants in three samples, and today we will be looking at family inheritance patterns.
-As you may have noticed, the three samples sequenced in our data are related, and form a "trio" (mother-father-son). 
-Trios and other members of an affected individual's family are often sequenced in clinical genetics, allowing clinicians to establish the inheritance pattern of the trait or identify new _de novo_ mutations that may have arisen independently of the parents.
+Some single gene and well-known Mendelian genetic disorders, such as sickle-cell anemia, Tay–Sachs disease and cystic fibrosis, can be relatively straightfoward to diagnose. However, much of the time, it's a lot more complex than a single gene with a well-characterised mutation, and the diagnostic variant we are searching for has be to sifted out 3 billion base pairs' worth of possible variation. 
 
-### This week's tutorial
 
-This week's tutorial is liberally taken from two tutorials written by Aaron Quinlan & his group at University of Utah.
+Today we will be looking at a variation filtering and curation method using family inheritance patterns. Modes of inheritance can provide some good logic to help us match the patterns of variant inheritance to the patterns of phenotype inheritance that we observe in the patient's family. For example, does mum or dad are carry the condition? Is it a _de novo_ mutation, that may have arisen independently of the parents?
+
+
+As you may have noticed, the three samples sequenced in our data are related to each other, and form a "trio" (mother-father-son). Trios are a very standard approach in clinical genetics, especially common for prenatal testing.
+
+### 1.1 Reminder about virtual Machines
+
+As usual we will be connecting the virtual machines: 
+
+**Please [go here](../../Course_materials/vm_login_instructions.md) for instructions on connecting to your VM.**
+
+### 1.3 Learning Outcomes
+
+CHANGEME
+1. Get comfy manipulating annotation info in a vcf file
+2. Understand what a monumental task it is trying to find diagnostic variants
+3. Refresher on vcf file specifications
+4. Learn about common variant annotations and annotation databases
+5. Get an idea of common annotations and the logic behind why we include them
+
+
+
+
+### 1.3 This week's tutorial
+
+This week's tutorial is liberally taken from two tutorials written by Aaron Quinlan & his group at University of Utah, and introduces us the variant priorisation software 'Gemini'.
 
 - [Identifying dominant gene candidates with GEMINI](https://s3.amazonaws.com/gemini-tutorials/Gemini-Dominant-Tutorial.pdf)
 - [Identifying recessive gene candidates with GEMINI](https://s3.amazonaws.com/gemini-tutorials/Gemini-Recessive-Tutorial.pdf)
 
-Both of these tutorials do a really good job at introducing the program `gemini`, which is used quite a bit across clinical genetics studies.
+There are a lot of variant prioritisation programs similar to this one including Variantgrid, Emedgene, Franklin, Nostos and many others. 
 [Gemini](https://gemini.readthedocs.io/en/latest/) is a database system that can read in VCF information and family/pedigree information, to enable database querying and clinical genetics analyses.
 Information in gemini is stored in database system called SQL.
-SQL stands for Structured Query Language, and is a popular database system in many industries and enables the store of organised information that can be accessed by queries.
+SQL stands for Structured Query Language, and is a SUPER popular database system in many industries.
 It comes in many flavours that you might have heard before, including `MySQL`, `SQLite` and `PostgreSQL`.
 
-Now let's create and activate a conda environment with Gemini installed:
+Let's create and activate a conda environment with Gemini installed:
 ```bash
 # First go to the working directory we created yesterday:
 cd ~/clinical_genomics
@@ -43,14 +58,16 @@ source activate geminiEnv
 gemini -h
 ```
 
-### Cohort databases
+### 1.3 Cohort databases
 
 Lets make some databases!
 Gemini can take the VCF file and sample information in the form of a ped file (short for pedigree).
-The ped file is actually a standard metadata information file that was developed in the [genetics application `PLINK`](http://zzz.bwh.harvard.edu/plink/data.shtml#ped).
-This program is used extensively for genome-wide association studies, and was developed in the era of genotyping arrays rather than WGS approaches. 
+The ped file is actually a standard metadata information file that was developed for in the age of population genetics and GWAS analyses.
 
-Unfortunately the database loading command also adds a lot of annotation information that requires >50GB of data to be used, so instead of running the loading commands below, let's use a pre-generated database: ___trio.trim.vep.dominant.db___
+
+Unfortunately the database loading command also adds a lot of annotation information with memory requirements, so let's use a pre-generated database: ___trio.trim.vep.dominant.db___
+
+The command you would have run is here for your info:
 
 ```bash
 # Loading VCF files require all the annotation databases
@@ -61,27 +78,26 @@ Unfortunately the database loading command also adds a lot of annotation informa
 
 We'll use this database for our querying and `autosomal_dominant` analysis.
 
-### Querying a SQL database in Gemini
+### 1.4 Querying a SQL database in Gemini
 
-Firstly some quick points on SQL and examples on how to use SQL queries. 
-The instructions for extracting data from the database file is relatively straight forward.
+First - here's some quick points on SQL and examples on how to use SQL queries. 
+
 Information is stored in tables, much like a sheet within a Microsoft Excel Spreadsheet file.
-You can ask the database to give you specific information and also put restrictions on the type of information thats needed (such as a conditional like "the sex of the person must be female").
+You can ask the database to give you specific, tabular information and also put restrictions on the type of information that is needed (such as a conditional like "the sex of the person must be female").
 
-Given that we are generally using the standard gemini tools to load and arrange data within the database, we will not be using a lot of the [standard SQL commands](https://www.codecademy.com/articles/sql-commands).
-Really we only need to know how to query the database using the `SELECT` and `FROM` command.
-We will also need some conditionals to  like `WHERE`, `IS`, `IS NOT` etc
+If you are interested, you can find a lot more info on [standard SQL commands](https://www.codecademy.com/articles/sql-commands).
 
-In order to query we need to know what we have.
+For this prac, we only need to know how to query the database using the `SELECT` and `FROM` command.
+We will also need some conditionals to  like `WHERE`, `IS`, `IS NOT` etc. 
+
+Let's have a look at what we have in the database file:
 
 ```bash
 gemini db_info trio.trim.vep.dominant.db
 ```
 
-As you can see, we have a number of tables.
-Within those tables we have columns.
-And the data within those columns has a specific data type.
-All of these are available to be queried
+As you can see, we have a number of tables. Within those tables we have columns.
+And the data within those columns has a specific data type, all of which we can query.
 
 Let's look at some examples by using the `gemini query` sub-command.
 
@@ -121,10 +137,20 @@ Now that we known the query structure and tables that we have in our database, c
 
 ---
 
-### Autosomal Dominant disorder
+CHANGEME
+<details>
+<summary>Answers</summary>
+1. 	Expected: 86.9	Observed: 11
+2. 0.03135
+3. SNV: 14-82565377 G-C (GRCh37)
 
-Autosomal dominant disorders are genetic disorders that do not involve the sex chromosomes (those are referred to as "sex-linked") and are passed down through families in a vertical transmission pattern. 
-Incomplete penetrance can occur within the family, meaning that disorder may skip a generation.
+</details>
+
+
+## **2. Autosomal Dominant disorders**
+
+Autosomal dominant disorders are genetic disorders that do not involve the sex chromosomes and are passed down through families in a vertical transmission pattern. 
+Incomplete penetrance can occur within the family, meaning that disorder may not always show phenotypically.
 `Penetrance` here means "the extent to which a particular gene or set of genes is expressed in the phenotypes of individuals carrying it, measured by the proportion of carriers showing the characteristic phenotype."
 
 ![https://www.mayoclinic.org/autosomal-dominant-inheritance-pattern/img-20006210](https://www.mayoclinic.org/-/media/kcms/gbs/patient-consumer/images/2013/11/15/17/37/r7_autosomaldominantthu_jpg.jpg)
@@ -136,8 +162,9 @@ It occurs in about in 1 in 1,000 to 3,000 individuals (1 in ~1,000 in Europeans)
 
 ![Trio pattern](images/family.png)
 
-Both the mother (`1805`) and the son (`4805`) are affected with the disorder, with normal plasma HDL, fat malabsorption and are in the bottom 5% for plasma cholesterol and triglycerides.
-We want to be able to see these sort of relationships in the PED file so lets have a quick look at that
+Both the mother (`1805`) and the son (`4805`) are affected with the disorder. Although they have normal plasma HDL, they suffer from fat malabsorption and are in the bottom 5% for plasma cholesterol and triglycerides.
+
+We want to be able to see these sort of relationships in the PED file so lets have a quick look:
 
 ```bash
 cat dominant.ped | column -t
@@ -148,14 +175,14 @@ family1     1847       -9           -9           1    1          CEU
 family1     4805       1847         1805         1    2          CEU
 ```
 
-As you can see, all of the relationships between the individuals are recorded in the PED file, including the sex of the individuals and their prevalence of the phenotype.
-You can imagine that when sampling larger families, or even populations, all of the unique inheritance patterns can be recorded here and used to inform the clinical model when it comes to identifying candidate genes or variants for the disorder.
+As you can see, all of the relationships between the individuals are recorded in the PED file, including the sex of the individuals and the prevalence of the phenotype. -9 means NA here.
+When sampling larger families, or even populations, all of the unique inheritance patterns can be recorded here and used to inform the clinical model when it comes to identifying candidate genes or variants for the disorder.
 
-### Sample genotype queries
+### 2.1 Sample genotype queries
 
 Given that we will be comparing the pattern of inheritance of these variants, its easy to filter variants so that you pick up specific relationships between individuals.
-For example, what if we wanted to identify variants where both 1805 and 4805 have a non-reference allele?
-(After all, 1805 and 4805 are both affected)
+For example, what if we wanted to identify variants where both 1805 (mum) and 4805 (son) have a non-reference allele?
+(After all, 1805 and 4805 are both affected, so this seems likely!)
 
 ```bash
 # Show all info
@@ -195,7 +222,7 @@ gemini query -q "SELECT chrom, start, end, ref, alt, gene, impact, (gts).(*) \
 Here you can add quality filters for each of the genotypes. 
 You can look at variant depth and quality in each genotype by using the `gt_depth` and `gt_quals`
 
-### `autosomal_dominant` tool
+### 2.2 Using the `autosomal_dominant` tool
 
 Gemini already comes with a number of tools that allow you to assess particular types of clinical genetic patterns, including one for autosomal dominant disorders.
 This tool has the known characteristics of this type of genetic disorder hard-coded into the function.
@@ -206,12 +233,12 @@ The genotype requirements for an autosomal dominant disorder are:
    - One of which is defective
 2. No unaffacted can be heterozygous or homozygous alternate
    - However they can be unknown
-3. Can't be `de-novo` mutations
+3. Can't be `de-novo` mutations (i.e., can't be any variants not seen in mum and/or dad)
 4. Affected individual must have an affected parent
-5. All affected must have parents where the phenotype is known
+5. All affecteds must have parents where the phenotype is known
    - Otherwise throw a warning
 
-Ok lets have a look:
+Let's have a look at it:
 
 ```bash
 gemini autosomal_dominant \
@@ -220,9 +247,9 @@ gemini autosomal_dominant \
 ```
 
 Here we are running the `autosomal_dominant` tool, and extracting specific columns of information from the database, printing only the first few lines and separating them out into tab delimited columns so we can see whats going on.
-We want to include the important information like whether the variant is in a gene, what the impact of the variant is, and whats the pathogenicity of that variant (using the raw CADD score).
+We want to include the important information like whether the variant is in a gene, what the impact of the variant is, and whats the pathogenicity of that variant (using the raw CADD score annotation, if you remember back from last prac).
 
-From here we can start widdling down our variants based on variant filtering concepts that we learnt earlier in the week.
+From here we can continue the variant filtering process to a few candidates, then 'curate' them to the most likely diagnostic causal one.
 
 ---
 ___>>> TASK <<<___
@@ -248,3 +275,13 @@ ___>>> EXTRA TASK <<<___
 2. What `gemini` functions can be employed to identify recessive variants?
 
 ---
+
+
+
+```bash
+gemini autosomal_recessive \
+    --columns "chrom, start, end, ref, alt, gene, impact, cadd_raw" \
+    trio.trim.vep.recessive.db | head | column -t
+```
+
+gemini query -q "SELECT * FROM variants WHERE (gts).0 == 1 AND (gts).1 == 1"
