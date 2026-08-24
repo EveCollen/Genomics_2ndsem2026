@@ -4,7 +4,7 @@
 
 
 #### By Evelyn Collen
-(prac repurposed from the excellent Julien Soubrier)
+(Prac repurposed from the excellent Julien Soubrier)
 
 ## **1. Introduction**
 
@@ -16,12 +16,12 @@ Many labs in major hospitals, pathology centres, independent research institutes
 
 Research has the goal of adding to human knowledge and also informing clinical practice (_i.e.,_ can we further inform a patient's genetic diagnosis? Can we help provide diagnoses at the cutting edge of research, where a standard clinical workflow couldn't?). Research asks: what unknowns are discoverable, what hypotheses can be made, what workflows and treatments can be applied and tested? 
 
-The diagnostic mindset takes an inverse approach to these questions. The goal here is to identify _already known_ patterns in our genomics data, with an emphasis of using well established and highly tested and validated "best practices". Diagnostic tests are also about identifying known issues in the quickest and most reliable way possible, because downstream clinical decisions are reliant on the information, much like other work in pathology testing (such as blood profiling).
+The diagnostic mindset takes an inverse approach to these research questions. The goal here is to identify _already known_ patterns in our genomics data, with an emphasis of using well established and highly tested and validated "best practices". Diagnostic tests are also about identifying known issues in the quickest and most reliable way possible, because downstream clinical decisions are reliant on the information.
 
-A critical thing to considering about high-throughput sequencing is the enormous amount of information that is obtained. Using the earring analogy from our lecture video, finding an earring (~1mm or basepair) on your roadtrip from Melbourne to Perth (3 billiom mm, or basepairs) is an enormous task!
+A critical thing to consider about high-throughput sequencing is the enormous amount of information that is obtained. Using the earring analogy from our lecture video, finding an earring (~1mm or basepair) on your roadtrip from Melbourne to Perth (3 billiom mm, or basepairs) is an enormous task!
 
-Additionally, a lot of the information that we obtain from sequencing data is noisy and difficult to interpret. This is the reason why, in a lot of pathology testing, we have primarily focussed on the "protein-coding" regions (~1% of the total sequence), where we know there is a good chance that a genetic variation may bring about a phenotypic change.
-Non-coding and intronic regions of the genome, or the other 99% are much more difficult to interpret, although many projects such as the [Epigenomics Roadmap](http://www.roadmapepigenomics.org/) or [Encyclopedia of DNA elements (ENCODE)](https://www.encodeproject.org/) are trying to change that. Slowly but surely, clinical is chasing after research,  by identifying "functional" regions of the non-coding genome that impact gene expression.
+Additionally, a lot of the information that we obtain from sequencing data is noisy and difficult to interpret. This is the reason why, in a lot of genetic pathology testing, we have primarily focussed on the "protein-coding" regions (~1% of the total sequence), where we know there is a good chance that a genetic variation may bring about a phenotypic change.
+Non-coding and intronic regions of the genome, or the other 99%, are much more difficult to interpret, although many projects such as the [Epigenomics Roadmap](http://www.roadmapepigenomics.org/) or [Encyclopedia of DNA elements (ENCODE)](https://www.encodeproject.org/) are trying to change that. Slowly but surely, clinical is chasing after research,  by identifying functional regions of the non-coding genome that impact gene expression.
 
 In this tutorial, we are firstly going to look at ways in which we can give context and functionality to variants, by doing a process called "variant annotation".
 
@@ -35,7 +35,7 @@ As usual we will be connecting the virtual machines:
 
 
 1. Get comfy manipulating annotation info in a vcf file
-2. Understand what a monumental task it is trying to find diagnostic variants
+2. Understand the monumental task that is trying to find diagnostic variants in the human genome
 3. Refresher on vcf file specifications
 4. Learn about common variant annotations and annotation databases
 5. Get an idea of common annotations and the logic behind why we include them
@@ -58,17 +58,18 @@ The data has been pre-generated for you:
 We will mostly use **BCFtools** for this tutorial:
 https://samtools.github.io/bcftools/bcftools.html
 
-As our VCF file already has previous annotations attached, let's start by stripping off that information so we can start the process at the start.
+As our VCF file already has previous annotations attached. Let's start by stripping off that information so we can start the process at the start.
 
 Think of annotations as a map of landmarks we can use to find that pesky earring on our roadtrip!
 
-First let's make a working directory, copy the data over, and activate a standalone conda environment that contains BCFtools
+First let's make a working directory, copy the data over, and activate a standalone conda environment that contains BCFtools:
+
 ```bash
 mkdir -p ~/clinical_genomics && cd $_
 cp /shared/data/clinical_genomics/*  ~/clinical_genomics/
 source activate bioinf
 ```
-It's always a good idea to stare at your files before and after you change them! Let's have a look into our pre-annotated vcf file. If you scroll down a little, you should see a whole of of information in the FILTER and INFO columns:
+It's always a good idea to stare at your files before and after you change them! Let's have a look into our pre-annotated vcf file. If you scroll down a little, you should see a whole of information in the FILTER and INFO columns:
 
 ```bash
 zless trio.trim.vep.vcf.gz
@@ -95,7 +96,7 @@ List the files in the directory and see what is produced.
 
 Firstly, lets review the Variant Call Format (VCF) file. 
 
-This is the standard file for listing variants that are 'called' via a variant calling tools such as `BCFtools`, `GATK` or `freebayes`.
+This is the standard file for listing variants that are 'called' via a variant calling tools such as `BCFtools`, `GATK`, `freebayes` or `DeepVariant`.
 The basic premise for calling variants is to identify both alleles (in a diploid genome).
 To do this, sequenced DNA fragments ("reads") are aligned to the reference sequence and the base at each position is determined, counted, and filtered to determine whether the site is different from the reference sequence.
 If the site is polymorphic, we count the bases at the position and determine whether it is a homozygous or a heterozygous variant.
@@ -110,7 +111,7 @@ The header is denoted by lines that start with two # (i.e. ^##).
 The name of the fields for the rest of the file (that contain the actual results) is denoted by lines that start with only one # (i.e. ^#)
 
 ```bash
-zless trio.trim.vcf.gz
+zcat trio.trim.vcf.gz | head
 ```
 
 Headers have heaps of metadata regarding the aligned reference genome, and gives you all the steps that were run to make the file, as well as the definitions of the specific fields and tags within the file.
@@ -137,7 +138,18 @@ ___>>> Questions <<<___
 1. Homo_sapiens_assembly19.fasta 
 2. UnifiedGenotyper
 3. 1805, 1847, 4805 
-4. You could run zgrep -v '^#' trio.trim.vcf.gz | cut -f1 | sort -V | uniq -c to get this info, or if you're a bcftools whiz, bcftools query -f '%CHROM\n' trio.trim.vcf.gz | sort -V | uniq -c | awk '{print "chr"$2, $1}'. That should give you the following variants per chromosome:
+4. You could run:
+
+```bash
+zgrep -v '^#' trio.trim.vcf.gz | cut -f1 | sort -V | uniq -c
+```
+to get this info, or if you're a bcftools whiz: 
+
+```bash
+bcftools query -f '%CHROM\n' trio.trim.vcf.gz | sort -V | uniq -c | awk '{print "chr"$2, $1}'
+```
+
+That should give you the following variants per chromosome:
 
 chr2 7081
 chr15 2922
@@ -160,7 +172,7 @@ We can add a tag (_i.e.,_ a bit of text) in the FILTER field to indicate that ou
 Put the text "LowQual" to the FILTER tag when QUAL<30, and print the result to the screen:
 
 ```bash
-bcftools filter -m -x -sLowQual -e'%QUAL<30' trio.trim.vcf.gz
+bcftools filter -m x -s LowQual -e 'QUAL<30' trio.trim.vcf.gz
 ```
 
 Do that again but look at just the low quality variants that we just annotated
@@ -178,7 +190,7 @@ bcftools filter --help
 ```
 
 2. Variants that are located close to indels can also indicate poor quality calls, so:
-- Use the `bcftools filter` sub-command to tag variants that are within 10 base-pairs of an InDel, in addition to the LowQual ones we just tagged with QUAL<30 (hint: check out the SnpGap option from the help menu to help you build your command)
+Use the `bcftools filter` sub-command to tag variants that are within 10 base-pairs of an InDel, in addition to the LowQual ones we just tagged with QUAL<30 (hint: check out the SnpGap option from the help menu to help you build your command)
 
 ---
 
@@ -193,6 +205,12 @@ You can pipe into grep to look at the SnpGap locations:
 ```bash
 bcftools filter -m x -g 10 -s LowQual -e 'QUAL<30' trio.trim.vcf.gz | grep SnpGap
 ```
+You can further pipe that into wc -l to count up how many variants there are like this:
+
+```bash
+bcftools filter -m x -g 10 -s LowQual -e 'QUAL<30' trio.trim.vcf.gz | grep SnpGap | wc -l
+```
+
 
 </details>
 
@@ -219,7 +237,7 @@ Gnomad is helpful in knowing variant frequencies, and in finding predictive loss
 ---
 <details>
 <summary>Answers</summary>
-1. 	Expected: 86.9	Observed: 11
+1. 	Expected: 86.9	Observed: 11. Since the observed number of plof variants is a lot lower than expected, it likely means this gene is under pretty strong purifying/negative selection - i.e., plof variants don't want to accumulate here, because the gene is really important to survival. 
 2. 0.03135
 3. SNV: 14-82565377 G-C (GRCh37)
 
@@ -234,7 +252,7 @@ First, let's index this dbSNP reference VCF, to help the lookup go faster:
 bcftools index -t hg19.dbSNP.vcf.gz
 ```
 
-Now we can add rsIDs using the `bcftools annotation` sub-command and output a new files with our IDs attached
+Now we can add rsIDs using the `bcftools annotation` sub-command and output a new file with our IDs attached:
 
 ```bash
 bcftools annotate -c CHROM,FROM,ID,REF,ALT \
@@ -246,14 +264,22 @@ bcftools annotate -c CHROM,FROM,ID,REF,ALT \
 ___>>> QUESTIONS <<<___
 ---
 
-1. Is the variant we explored in gnomAD (rs75115269) present in this VCF?
-2. Can you find the variant rs191680234, get its genomic coordinates, and identify for which individual it is variable?
+1. Is the variant we explored in gnomAD (rs75115269) present in the hg19.dbSNP.vcf.gz?
+2. In the output, trio.trim.dbSNP.vcf.gz, can you find the variant rs191680234, get its genomic coordinates, and identify for which individual it is variable?
 
 ---
 
 <details>
 <summary>Answers</summary>
-1. Nope, we don't have chr14 in this vcf!
+1. Yes, we can see it at chr14 82099033, as expected. You can use either of the following to find it:
+
+```bash
+zgrep rs75115269 hg19.dbSNP.vcf.gz
+
+bcftools view -i 'ID=="rs75115269"' hg19.dbSNP.vcf.gz
+```
+
+
 2. zgrep rs191680234 trio.trim.dbSNP.vcf.gz shows us the following line:
 2	71797762	rs191680234	G	A	440.24	.	.	GT	0/0	0/1	0/0
 We can see the second sample, 1847, has a heterozygous genotype 0/1. 
@@ -311,8 +337,8 @@ For these questions, you may need to refer to the [bcftools man page:](https://s
 
 
 
-1. How many variants have a reported "missense_variant"? (TIP: You need to build a 'bcftools view' command - you will need to add the '--include' parameter; -H to get rid of the header; the expression you want to test will be 'INFO/CSQ~"missense_variant"'). Your command should look something like this: bcftools view --include {'expression'} -H {vcf}
-2. How many variants that are greater than quality 30 have a reported "missense_variant"? (Tip: the expression you need is 'QUAL>30', and you can string it together with the others like so: bcftools view --include '{expression} & {expression}' -H {vcf})
+1. How many variants have a reported "missense_variant"? (TIP: You need to build a 'bcftools view' command - you will need to add the '--include' parameter; -H to get rid of the header; and the expression you want to test will be 'INFO/CSQ~"missense_variant"'). Your command should look something like this: bcftools view --include {'expression'} -H {vcf}
+2. How many variants that are greater than quality 30 have a reported "missense_variant"? (Tip: the expression you need is 'QUAL>30', and you can string it together with your previous command like so: bcftools view --include '{expression} & {expression}' -H {vcf})
 3. How many variants are annotated to have gained a stop codon? (Tip: the expression you need is 'INFO/CSQ~"stop_gained"')
 
 ---
