@@ -134,7 +134,7 @@ Note: Depending on the data type, you may need to surround character info in ''.
 
 
 ---
-___>>> TASK <<<___
+### **Questions:**
 
 ---
 
@@ -291,7 +291,7 @@ gemini autosomal_dominant \
 ```
 
 ---
-**Question:**
+### **Question:**
 ---
 
 Can you figure out how many variants have an autosomal dominant inheritance pattern for this family? (Hint: you need to remove the header, and can do this if you pipe into 'tail -n +2').
@@ -329,7 +329,7 @@ Now we have gotten down to 1303 variants!
 
 
 ---
-**Question:**
+### **Questions:**
 
 ---
 #### Find candidate variants for Hypobetalipoproteinemia
