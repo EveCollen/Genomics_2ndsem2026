@@ -33,8 +33,6 @@ CHANGEME
 5. Get an idea of common annotations and the logic behind why we include them
 
 
-
-
 ### 1.3 This week's tutorial
 
 This week's tutorial is liberally taken from two tutorials written by Aaron Quinlan & his group at University of Utah, and introduces us the variant priorisation software 'Gemini'.
@@ -179,7 +177,7 @@ gemini query -q "SELECT chrom, start, end, ref, alt, qual, gts FROM variants WHE
 Output:
 chr22   50691919        50691920        T       G       1543.93005371   T/G,T/G,T/G
 
-By chance, all 3 family member carry the same het genotype for this variant!
+By chance, all 3 family members carry the same het genotype for this variant!
 
 4.
 
@@ -293,7 +291,7 @@ gemini autosomal_dominant \
 ```
 
 ---
-___>>> QUESTION <<<___
+**Question:**
 ---
 
 Can you figure out how many variants have an autosomal dominant inheritance pattern for this family? (Hint: you need to remove the header, and can do this if you pipe into 'tail -n +2').
@@ -331,7 +329,7 @@ Now we have gotten down to 1303 variants!
 
 
 ---
-___>>> TASK <<<___
+**Question:**
 
 ---
 #### Find candidate variants for Hypobetalipoproteinemia

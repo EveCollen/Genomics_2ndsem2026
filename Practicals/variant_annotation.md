@@ -124,7 +124,7 @@ No need to spend a lot of time on this - but if you need, you can refer to the f
 [VCF file format spec](https://samtools.github.io/hts-specs/VCFv4.2.pdf)
 
 ---
-___>>> Questions <<<___
+**Questions:**
 ---
 
 1. What was the name of the reference genome file was used to make the VCF file?
@@ -181,7 +181,7 @@ bcftools filter -m x -s LowQual -e 'QUAL<30' trio.trim.vcf.gz | grep 'LowQual'
 ```
 
 ---
-___>>> Task <<<___
+**Question:**
 ---
 
 1. Have a look at the options we just used (-m x, -s, -e) and their explanations by running
@@ -226,7 +226,7 @@ These rsIds are helpful because it provides an extensive list of information abo
 There are now databases such as the [genome aggregation database (gnomAD)](https://gnomad.broadinstitute.org/) that samples over 730,947 exomes and 76,215 genomes (gnomad v4, on hg38).
 
 ---
-___>>> TASK <<<___
+**Questions:**
 ---
 
 Gnomad is helpful in knowing variant frequencies, and in finding predictive loss-of-function (pLoF) variants.
@@ -261,7 +261,7 @@ bcftools annotate -c CHROM,FROM,ID,REF,ALT \
 ```
 
 ---
-___>>> QUESTIONS <<<___
+**Questions:**
 ---
 
 1. Is the variant we explored in gnomAD (rs75115269) present in the hg19.dbSNP.vcf.gz?
@@ -330,7 +330,7 @@ zgrep "^##INFO=<ID=CSQ" trio.trim.vep.vcf.gz
 ```
 
 ---
-___>>> QUESTIONS <<<___
+**Questions:**
 ---
 
 For these questions, you may need to refer to the [bcftools man page:](https://samtools.github.io/bcftools/bcftools.html#expressions)
