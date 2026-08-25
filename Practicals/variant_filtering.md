@@ -3,16 +3,16 @@
 
 
 #### By Evelyn Collen
-(prac repurposed from the excellent Julien Soubrier)
+(Prac repurposed from the excellent Julien Soubrier)
 
 ## **1. Some background**
 
-Last prac, we annotated a bunch of information into a vcf and learnt about the annotating process. Variant filtering (also called variant priorisation) then gets us down to a handful of candidates - and then, if the evidence is strong enough for one of them, we can report that as our diagnostic variant in the variant classification and curation step.
+Last prac, we annotated a bunch of information into a vcf and learnt about annotating functional info into the vcf. Variant filtering (also called variant priorisation) then gets us down to a handful of candidates based on applying logic to that functional information - and then, if the evidence is strong enough, we can report out our diagnostic variant (this is called the variant curation process).
 
-Some single gene and well-known Mendelian genetic disorders, such as sickle-cell anemia, Tay–Sachs disease and cystic fibrosis, can be relatively straightfoward to diagnose. However, much of the time, it's a lot more complex than a single gene with a well-characterised mutation, and the diagnostic variant we are searching for has be to sifted out 3 billion base pairs' worth of possible variation. 
+Some well-known Mendelian genetic disorders, with single gene causes such as sickle-cell anemia, Tay–Sachs disease and cystic fibrosis, can be relatively straightfoward to diagnose. However, often it's a lot more complex than a single gene with a well-characterised mutation. Not only that, the diagnostic variant we are searching for has be to sifted out 3 billion base pairs' worth of possible variation!
 
 
-Today we will be looking at a common variation filtering and curation method, which uses family inheritance patterns. Modes of inheritance can provide some good logic to help us match the patterns of variant inheritance to the patterns of phenotype inheritance that we observe in the patient's family. For example, does mum or dad carry the condition? Is it a _de novo_ mutation, that may have arisen in the patient, independently of their parents?
+Today we will be looking at some common variation filtering and curation methods. We're going to be focussing on family inheritance patterns. Modes of inheritance can provide some good logic to help us match the patterns of variant inheritance to the patterns of phenotype inheritance that we observe in the patient's family. For example, does mum or dad carry the condition? Is it a _de novo_ mutation, that may have arisen in the patient, independently of their parents?
 
 
 As you may have noticed, the three samples sequenced in our data are related to each other, and form a "trio" (mother-father-son). Trios are a very standard approach in clinical genetics, and are especially common for prenatal testing.
@@ -25,29 +25,30 @@ As usual we will be connecting the virtual machines:
 
 ### 1.3 Learning Outcomes
 
-CHANGEME
-1. Learn about SQL databases and running SQL commands
-2. Understand what a monumental task it is trying to find diagnostic variants
-3. Refresher on vcf file specifications
-4. Learn about common variant annotations and annotation databases
-5. Get an idea of common annotations and the logic behind why we include them
+1. Learn about SQL databases and running basic SQL commands
+2. Learn about the logic behind filtering out non-diagnostic variants (e.g. too common in population databases)
+3. Learn about how mode of inheritance can help in filtering
+4. Learn about population databases and filtering out common variants
+5. Get an idea of using Gemini and pulling info about variants from a database format
+6. Find diagnostic variant candidate(s) for hypolipoproteinemia in an affected trio
 
 
 ### 1.3 This week's tutorial
 
-This week's tutorial is liberally taken from two tutorials written by Aaron Quinlan & his group at University of Utah, and introduces us the variant priorisation software 'Gemini'.
+This week's tutorial is liberally taken from some tutorials written by Aaron Quinlan & his group at University of Utah, and introduces us the variant priorisation software 'Gemini'.
 
 - [Identifying dominant gene candidates with GEMINI](https://s3.amazonaws.com/gemini-tutorials/Gemini-Dominant-Tutorial.pdf)
-- [Identifying recessive gene candidates with GEMINI](https://s3.amazonaws.com/gemini-tutorials/Gemini-Recessive-Tutorial.pdf)
 
-There are a lot of variant prioritisation programs similar to this one including Variantgrid, Emedgene, Franklin, Nostos and many others. 
+
+There are a lot of variant prioritisation programs similar to this one including Variantgrid, Emedgene, Franklin,  and many others. Several are using AI under the hood, although because of the dynamism that comes with AI continuously updating itself, they can be tricky to incorporate
+
 [Gemini](https://gemini.readthedocs.io/en/latest/) is a database system that can read in VCF information and family/pedigree information, to enable database querying and clinical genetics analyses.
-Information in gemini is stored in database system called SQL.
+Information in gemini is stored in a database system called SQL.
 SQL stands for Structured Query Language, and is a SUPER popular database system in many industries.
 It comes in many flavours that you might have heard before, including `MySQL`, `SQLite` and `PostgreSQL`.
 
 Let's create and activate a conda environment with Gemini installed.
-First go to the working directory we created last prac (uncomment and run the first two commands if the ~/clinical_genomics doesn't exist):
+First go to the working directory we created last prac (uncomment and run the first two commands, if your ~/clinical_genomics doesn't exist):
 
 ```bash
 #mkdir -p ~/clinical_genomics && cd $_
