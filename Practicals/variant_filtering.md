@@ -33,7 +33,7 @@ As usual we will be connecting the virtual machines:
 6. Find diagnostic variant candidate(s) for hypolipoproteinemia in an affected trio
 
 
-### 1.3 This week's tutorial
+### 1.4 This week's tutorial
 
 This week's tutorial is liberally taken from some tutorials written by Aaron Quinlan & his group at University of Utah, and introduces us the variant priorisation software 'Gemini'.
 
@@ -64,7 +64,7 @@ source activate geminiEnv
 gemini -h
 ```
 
-### 1.3 Cohort databases
+### 1.5 Cohort databases
 
 Lets make some databases!
 Gemini can take the VCF file and sample information in the form of a ped file (short for pedigree).
@@ -84,7 +84,7 @@ The command you would have had to run is here for your info:
 
 We'll use this database for our querying, and our `autosomal_dominant` analysis.
 
-### 1.4 Querying a SQL database in Gemini
+### 1.6 Querying a SQL database in Gemini
 
 First - here's some quick points on SQL and examples on how to use SQL queries. 
 
