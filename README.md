@@ -7,18 +7,18 @@
 
 - Practical 1 - [Part 1: Variant Annotation](http://university-of-adelaide-bx-masters.github.io/Genomics/Practicals/variant_annotation.html)
 - Practical 2 - [Part 2: Variant Filtering](http://university-of-adelaide-bx-masters.github.io/Genomics/Practicals/variant_filtering.html)
-- Practical 3 - [Structural Variation](http://university-of-adelaide-bx-masters.github.io/Genomics/Practicals/structural_variation.html)
+- Practical 3 and 4 - [Structural Variation](http://university-of-adelaide-bx-masters.github.io/Genomics/Practicals/structural_variation.html)
 
 **Human Population Genomics**
 
-- Practical 4 - [Population Genomics Part 1](http://university-of-adelaide-bx-masters.github.io/Genomics/Practicals/population_genomics_part1.html)
-- Practical 5 - [Population Genomics Part 2](http://university-of-adelaide-bx-masters.github.io/Genomics/Practicals/population_genomics_part2.html)
+- Practical 5 - [Population Genomics Part 1](http://university-of-adelaide-bx-masters.github.io/Genomics/Practicals/population_genomics_part1.html)
+- Practical 6 - [Population Genomics Part 2](http://university-of-adelaide-bx-masters.github.io/Genomics/Practicals/population_genomics_part2.html)
 
 
 **Eukaryotic Genome Assembly**
 
-- Practical 6 - [Genome Assembly Part 1](http://university-of-adelaide-bx-masters.github.io/Genomics/Practicals/genome_assembly_prac_1.html)
-- Practical 7 - [Genome Assembly Part 2](http://university-of-adelaide-bx-masters.github.io/Genomics/Practicals/genome_assembly_prac_2.html)
+- Practical 7 - [Genome Assembly Part 1](http://university-of-adelaide-bx-masters.github.io/Genomics/Practicals/genome_assembly_prac_1.html)
+- Practical 8 - [Genome Assembly Part 2](http://university-of-adelaide-bx-masters.github.io/Genomics/Practicals/genome_assembly_prac_2.html)
 
 
 
