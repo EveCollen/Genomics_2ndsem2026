@@ -204,12 +204,16 @@ Use the `bcftools filter` sub-command to tag variants that are within 10 base-pa
 ```bash
 bcftools filter -m x -g 10 -s LowQual -e 'QUAL<30' trio.trim.vcf.gz 
 ```
-You can pipe into grep to look at the SnpGap locations:
+
+You can pipe into grep to look at the SnpGap locations:<br>
+
 
 ```bash
 bcftools filter -m x -g 10 -s LowQual -e 'QUAL<30' trio.trim.vcf.gz | grep SnpGap
 ```
+
 You can further pipe that into wc -l to count up how many variants there are like this:
+
 
 ```bash
 bcftools filter -m x -g 10 -s LowQual -e 'QUAL<30' trio.trim.vcf.gz | grep SnpGap | wc -l
@@ -241,8 +245,10 @@ Gnomad is helpful in knowing variant frequencies, and in finding predictive loss
 ---
 <details>
 <summary>Answers</summary>
-1. 	Expected: 86.9	Observed: 11. Since the observed number of plof variants is a lot lower than expected, it likely means this gene is under pretty strong purifying/negative selection - i.e., plof variants don't want to accumulate here, because the gene is really important to survival. 
-2. 0.03135
+1. 	Expected: 86.9	Observed: 11. Since the observed number of plof variants is a lot lower than expected, it likely means this gene is under pretty strong purifying/negative selection - i.e., plof variants don't want to accumulate here, because the gene is really important to survival. <br>
+
+2. 0.03135<br>
+
 3. SNV: 14-82565377 G-C (GRCh37)
 
 </details>
@@ -275,7 +281,8 @@ bcftools annotate -c CHROM,FROM,ID,REF,ALT \
 
 <details>
 <summary>Answers</summary>
-1. Yes, we can see it at chr14 82099033, as expected. You can use either of the following to find it:
+1. Yes, we can see it at chr14 82099033, as expected. You can use either of the following to find it:<br>
+
 
 ```bash
 zgrep rs75115269 hg19.dbSNP.vcf.gz
@@ -284,8 +291,10 @@ bcftools view -i 'ID=="rs75115269"' hg19.dbSNP.vcf.gz
 ```
 
 
-2. zgrep rs191680234 trio.trim.dbSNP.vcf.gz shows us the following line:
-2	71797762	rs191680234	G	A	440.24	.	.	GT	0/0	0/1	0/0
+2. zgrep rs191680234 trio.trim.dbSNP.vcf.gz shows us the following line:<br>
+
+2	71797762	rs191680234	G	A	440.24	.	.	GT	0/0	0/1	0/0<br>
+
 We can see the second sample, 1847, has a heterozygous genotype 0/1. 
 
 </details>
@@ -350,21 +359,26 @@ For these questions, you may need to refer to the [bcftools man page:](https://s
 
 <details>
 <summary>Answers</summary>
-1. The command to run is below, then piped into wc -l to count lines:
+1. The command to run is below, then piped into wc -l to count lines:<br>
+
 
 ```bash
  bcftools view --include 'INFO/CSQ~"missense_variant"' -H trio.trim.vep.vcf.gz | wc -l 
  ```
 
-The number of missense variants is 3287
-2. 
+The number of missense variants is 3287<br>
+
+2. <br>
+
 
 ```bash
 bcftools view --include 'INFO/CSQ~"missense_variant" & QUAL>30' -H trio.trim.vep.vcf.gz  | wc -l
 ```
+
 The number of missense variants with >30 quality is 3192
 
-3. 
+3. <br>
+
 ```bash
 bcftools view --include 'INFO/CSQ~"stop_gained"' -H trio.trim.vep.vcf.gz  | wc -l
 ```
