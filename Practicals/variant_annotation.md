@@ -18,10 +18,10 @@ Research has the goal of adding to human knowledge and also informing clinical p
 
 The diagnostic mindset takes an inverse approach to these research questions. The goal here is to identify _already known_ patterns in our genomics data, with an emphasis of using well established and highly tested and validated "best practices". Diagnostic tests are also about identifying known issues in the quickest and most reliable way possible, because downstream clinical decisions are reliant on the information.
 
-A critical thing to consider about high-throughput sequencing is the enormous amount of information that is obtained. Using the earring analogy from our lecture video, finding an earring (~1mm or basepair) on your roadtrip from Melbourne to Perth (3 billiom mm, or basepairs) is an enormous task!
+A critical thing to consider about high-throughput sequencing is the enormous amount of information that is obtained. Using the earring analogy from our lecture video, finding an earring (~1mm or basepair) on your roadtrip from Melbourne to Perth (3 billion mm, or basepairs) is an enormous task!
 
 Additionally, a lot of the information that we obtain from sequencing data is noisy and difficult to interpret. This is the reason why, in a lot of genetic pathology testing, we have primarily focussed on the "protein-coding" regions (~1% of the total sequence), where we know there is a good chance that a genetic variation may bring about a phenotypic change.
-Non-coding and intronic regions of the genome, or the other 99%, are much more difficult to interpret, although many projects such as the [Epigenomics Roadmap](http://www.roadmapepigenomics.org/) or [Encyclopedia of DNA elements (ENCODE)](https://www.encodeproject.org/) are trying to change that. Slowly but surely, clinical is chasing after research,  by identifying functional regions of the non-coding genome that impact gene expression.
+Non-coding and intronic regions of the genome, or the other 99%, are much more difficult to interpret, although many projects such as the [Encyclopedia of DNA elements (ENCODE)](https://www.encodeproject.org/) are trying to change that. Slowly but surely, clinical is chasing after research,  by identifying functional regions of the non-coding genome that impact gene expression.
 
 In this tutorial, we are firstly going to look at ways in which we can give context and functionality to variants, by doing a process called "variant annotation".
 
@@ -29,7 +29,7 @@ In this tutorial, we are firstly going to look at ways in which we can give cont
 
 As usual we will be connecting the virtual machines: 
 
-**Please [go here](../../Course_materials/vm_login_instructions.md) for instructions on connecting to your VM.**
+**Please ([go here](https://university-of-adelaide-bx-masters.github.io/Fundamentals_of_Bioinformatics/Course_materials/vm_login_instructions.html)) for instructions on connecting to your VM.**
 
 ### 1.2 Learning Outcomes
 
@@ -58,7 +58,7 @@ The data has been pre-generated for you:
 We will mostly use **BCFtools** for this tutorial:
 https://samtools.github.io/bcftools/bcftools.html
 
-As our VCF file already has previous annotations attached. Let's start by stripping off that information so we can start the process at the start.
+As our VCF file already has previous annotations attached, let's start by stripping off that information so we can start the process at the start.
 
 Think of annotations as a map of landmarks we can use to find that pesky earring on our roadtrip!
 
@@ -85,7 +85,7 @@ zless trio.trim.vcf.gz
 
 _NOTE ON INDEXING: In order to subset or retrieve data from a tab-delimited file (or any other delimited file for that matter), it is helpful to use an index. File indexes are a bit like the contact list in your phone, sorted alphabetically, so you can find your friends' phone numbers_.
 _A file index, commonly created by the program [`tabix`](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3042176/), can be created on most standard bioinformatics files (BED, VCF etc)._
-_It is good practice to create an index every time you make a new VCF file. A number of variant toolkit's (`gatk`, `picard`, `sambamb`, etc...) will often create an index automatically for you. You can either use the `tabix` program using the VCF prefix (`tabix -p vcf`) or use the `bcftools` sub-command `bcftools index`_
+_It is good practice to create an index every time you make a new VCF file. A number of variant toolkits (`gatk`, `picard`, `sambamb`, etc...) will often create an index automatically for you. You can either use the `tabix` program using the VCF prefix (`tabix -p vcf`) or use the `bcftools` sub-command `bcftools index`_
 
 **NOTE:** If you get an _[E::hts_idx_push] Unsorted positions on sequence #1_ error on the index command, you can quickly sort the file again using the `bcftools sort` command and reindexing.
 
@@ -135,26 +135,27 @@ No need to spend a lot of time on this - but if you need, you can refer to the f
 ---
 <details>
 <summary>Answers</summary>
-1. Homo_sapiens_assembly19.fasta 
-2. UnifiedGenotyper
-3. 1805, 1847, 4805 
-4. You could run:
+1. Homo_sapiens_assembly19.fasta<br>
+2. UnifiedGenotyper<br>
+3. 1805, 1847, 4805 <br>
+4. You could run:<br>
 
 ```bash
 zgrep -v '^#' trio.trim.vcf.gz | cut -f1 | sort -V | uniq -c
 ```
-to get this info, or if you're a bcftools whiz: 
+<br>
+to get this info, or if you're a bcftools whiz:<br>
 
 ```bash
 bcftools query -f '%CHROM\n' trio.trim.vcf.gz | sort -V | uniq -c | awk '{print "chr"$2, $1}'
 ```
+<br>
+That should give you the following variants per chromosome:<br>
 
-That should give you the following variants per chromosome:
-
-chr2 7081
-chr15 2922
-chr17 4789
-chr22 2445
+chr2 7081<br>
+chr15 2922<br>
+chr17 4789<br>
+chr22 2445<br>
 
 </details>
 
