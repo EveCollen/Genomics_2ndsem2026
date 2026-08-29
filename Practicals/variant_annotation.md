@@ -136,8 +136,11 @@ No need to spend a lot of time on this - but if you need, you can refer to the f
 <details>
 <summary>Answers</summary>
 1. Homo_sapiens_assembly19.fasta<br>
+
 2. UnifiedGenotyper<br>
+
 3. 1805, 1847, 4805 <br>
+
 4. You could run:<br>
 
 ```bash
