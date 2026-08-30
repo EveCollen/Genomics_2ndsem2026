@@ -21,7 +21,7 @@ As you may have noticed, the three samples sequenced in our data are related to 
 
 As usual we will be connecting the virtual machines: 
 
-**Please [go here](../../Course_materials/vm_login_instructions.md) for instructions on connecting to your VM.**
+**Please ([go here](https://university-of-adelaide-bx-masters.github.io/Fundamentals_of_Bioinformatics/Course_materials/vm_login_instructions.html)) for instructions on connecting to your VM.**
 
 ### 1.3 Learning Outcomes
 
@@ -151,36 +151,42 @@ Now that we known the query structure and tables that we have in our database, c
 
 <details>
 <summary>Answers</summary>
-1. 	
+1.<br>
 
 ```bash
 gemini query -q "SELECT chrom, start FROM variants WHERE aaf_1kg_eur < 0.5" trio.trim.vep.dominant.db | wc -l
 ```
-There are 12002
 
-2. 
+There are 12002<br>
+
+
+2.<br>
 
 ```bash
 gemini query -q "SELECT chrom, start, end, ref, alt, qual FROM variants WHERE gene = 'MAPK12' AND qual > 200" trio.trim.vep.dominant.db | wc -l
 ```
+
 There are 10 with qual > 200
 
 ```bash
 gemini query -q "SELECT chrom, start, end, ref, alt, qual FROM variants WHERE gene = 'MAPK12' AND qual > 500" trio.trim.vep.dominant.db | wc -l
 ```
+
 There are 9 with qual > 500
 
-3. 
+3.<br>
 
 ```bash
 gemini query -q "SELECT chrom, start, end, ref, alt, qual, gts FROM variants WHERE rs_ids = 'rs774794409'" trio.trim.vep.dominant.db 
 ```
-Output:
+
+Output:<br>
+
 chr22   50691919        50691920        T       G       1543.93005371   T/G,T/G,T/G
 
 By chance, all 3 family members carry the same het genotype for this variant!
 
-4.
+4.<br>
 
 Yes you can select the gene column from the table:
 
@@ -301,13 +307,15 @@ Can you figure out how many variants have an autosomal dominant inheritance patt
 
 <details>
 <summary>Answers</summary>
-Yes, we can count the lines and find the number of variants is 1541:
+Yes, we can count the lines and find the number of variants is 1541:<br>
+
 
 ```bash
 gemini autosomal_dominant \
     --columns "chrom, start, end, ref, alt, gene, impact, cadd_raw" \
     trio.trim.vep.dominant.db | tail -n +2 | wc -l
 ```
+
 </details>
 
 
@@ -346,7 +354,7 @@ Now we have gotten down to 1303 variants!
 
 <details>
 <summary>Answers</summary>
-1.
+1.<br>
 
 ```bash
 gemini autosomal_dominant \
@@ -356,7 +364,8 @@ trio.trim.vep.dominant.db \
 | tail -n +2 | wc -l
 
 ```
-Number of variants is now 338
+
+Number of variants is now 338<br>
 
 2.
 ```bash
@@ -367,10 +376,10 @@ trio.trim.vep.dominant.db \
 | tail -n +2 | wc -l
 ```
 
-We get down to 2! Yay!
+We get down to 2! Yay!<br>
 
 
-3. The output from gemini gives us the following: 
+3. The output from gemini gives us the following:<br>
 
 ```bash
  gemini autosomal_dominant \
@@ -378,13 +387,13 @@ We get down to 2! Yay!
  --filter "filter is NULL and impact_severity == 'HIGH' and aaf_esp_ea < 0.01 and aaf_exac_all < 0.01" \
 trio.trim.vep.dominant.db
 ```
-
+<br>
 | chrom | start | end | ref | alt | gene | impact | cadd_raw | variant_id | family_id | family_members | family_genotypes | samples | family_count |
 |---|---:|---:|---|---|---|---|---|---:|---|---|---|---|---:|
 | chr2 | 21236250 | 21236251 | G | A | APOB | stop_gained | None | 492 | family1 | 1805(1805;affected;female),1847(1847;unaffected;male),4805(4805;affected;male) | G/A,G/G,G/A | 1805,4805 | 1 |
-| chr22 | 21363743 | 21363744 | T | C | TUBA3FP | splice_acceptor_variant | None | 15272 | family1 | 1805(1805;affected;female),1847(1847;unaffected;male),4805(4805;affected;male) | T/C,T/T,T/C | 1805,4805 | 1 |
+| chr22 | 21363743 | 21363744 | T | C | TUBA3FP | splice_acceptor_variant | None | 15272 | family1 | 1805(1805;affected;female),1847(1847;unaffected;male),4805(4805;affected;male) | T/C,T/T,T/C | 1805,4805 | 1 |<br>
 
-If we have a quick look on genecards - we find that the APOB gene codes for a protein that is 'the main structural apolipoprotein of chylomicrons and low-density lipoproteins'. This perfectly explains our phenotype, and the mode of inheritance totally fits. The other gene, TUBA3FP, does not fit the output so well. 
+If we have a quick look on genecards - we find that the APOB gene codes for a protein that is 'the main structural apolipoprotein of chylomicrons and low-density lipoproteins'. This perfectly explains our phenotype, and the mode of inheritance totally fits. The other gene, TUBA3FP, does not fit the output so well. <br>
 
 If this was a real life case, we could go ahead and issue a report for this, which would go to the clinician. Hopefully finding this variant can allow for the better management and treatment of this patient's condition.
 
