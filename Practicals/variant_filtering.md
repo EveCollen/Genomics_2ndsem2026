@@ -207,6 +207,7 @@ MAPK12
 
 </code></pre>
 
+</details>
 
 ## **2. Autosomal Dominant disorders**
 
