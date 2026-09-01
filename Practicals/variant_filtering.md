@@ -7,9 +7,9 @@
 
 ## **1. Some background**
 
-Last prac, we annotated a bunch of information into a vcf and learnt about annotating functional info into the vcf. Variant filtering (also called variant priorisation) then gets us down to a handful of candidates based on applying logic to that functional information - and then, if the evidence is strong enough, we can report out our diagnostic variant (this is called the variant curation process).
+Last prac, we annotated a bunch of information into a vcf and learnt about the functional reasons behind the annotations. Variant filtering (also called variant priorisation) then gets us down to a handful of candidates based on applying logic to that functional information - and then, if the evidence is strong enough, we can report out our diagnostic variant (this is called the variant curation process).
 
-Some well-known Mendelian genetic disorders, with single gene causes such as sickle-cell anemia, Tay–Sachs disease and cystic fibrosis, can be relatively straightfoward to diagnose. However, often it's a lot more complex than a single gene with a well-characterised mutation. Not only that, the diagnostic variant we are searching for has be to sifted out 3 billion base pairs' worth of possible variation!
+Some well-known Mendelian genetic disorders, with single-gene causes such as sickle-cell anemia, Tay–Sachs disease and cystic fibrosis, can be relatively straightfoward to diagnose. However, often it's a lot more complex than a single gene with a well-characterised mutation. Not only that, the diagnostic variant we are searching for has be to sifted out 3 billion base pairs' worth of possible variation!
 
 
 Today we will be looking at some common variation filtering and curation methods. We're going to be focussing on family inheritance patterns. Modes of inheritance can provide some good logic to help us match the patterns of variant inheritance to the patterns of phenotype inheritance that we observe in the patient's family. For example, does mum or dad carry the condition? Is it a _de novo_ mutation, that may have arisen in the patient, independently of their parents?
@@ -27,7 +27,7 @@ As usual we will be connecting the virtual machines:
 
 1. Learn about SQL databases and running basic SQL commands
 2. Learn about the logic behind filtering out non-diagnostic variants (e.g. too common in population databases)
-3. Learn about how mode of inheritance can help in filtering
+3. Learn about how modes of inheritance can help in filtering
 4. Learn about population databases and filtering out common variants
 5. Get an idea of using Gemini and pulling info about variants from a database format
 6. Find diagnostic variant candidate(s) for hypolipoproteinemia in an affected trio
@@ -40,7 +40,7 @@ This week's tutorial is liberally taken from some tutorials written by Aaron Qui
 - [Identifying dominant gene candidates with GEMINI](https://s3.amazonaws.com/gemini-tutorials/Gemini-Dominant-Tutorial.pdf)
 
 
-There are a lot of variant prioritisation programs similar to this one including Variantgrid, Emedgene, Franklin,  and many others. Several are using AI under the hood, although because of the dynamism that comes with AI continuously updating itself, they can be tricky to incorporate
+There are a lot of variant prioritisation programs similar to this one including Variantgrid, Emedgene, Franklin, and many others. Several are using AI under the hood, although because of the dynamism that comes with AI continuously updating itself, they can be very tricky to incorporate into clinical work (that needs to be rigourously validated). 
 
 [Gemini](https://gemini.readthedocs.io/en/latest/) is a database system that can read in VCF information and family/pedigree information, to enable database querying and clinical genetics analyses.
 Information in gemini is stored in a database system called SQL.
@@ -48,7 +48,7 @@ SQL stands for Structured Query Language, and is a SUPER popular database system
 It comes in many flavours that you might have heard before, including `MySQL`, `SQLite` and `PostgreSQL`.
 
 Let's create and activate a conda environment with Gemini installed.
-First go to the working directory we created last prac (uncomment and run the first two commands, if your ~/clinical_genomics doesn't exist):
+First go to the working directory we created last prac (uncomment and run the first two commands, if your ~/clinical_genomics directory doesn't already exist):
 
 ```bash
 #mkdir -p ~/clinical_genomics && cd $_
@@ -66,12 +66,12 @@ gemini -h
 
 ### 1.5 Cohort databases
 
-Lets make some databases!
+Let's make some databases!
 Gemini can take the VCF file and sample information in the form of a ped file (short for pedigree).
-The ped file is actually a standard metadata information file that was developed for in the age of population genetics and GWAS analyses.
+The ped file is actually a standard metadata information file that was developed in the age of population genetics and GWAS analyses.
 
 
-Unfortunately the database loading command also adds a lot of annotation information with high memory requirements, so let's use a pre-generated database: ___trio.trim.vep.dominant.db___
+Unfortunately, the database loading command also adds a lot of annotation information with high memory requirements, so let's use a pre-generated database: ___trio.trim.vep.dominant.db___
 
 The command you would have had to run is here for your info:
 
@@ -89,7 +89,7 @@ We'll use this database for our querying, and our `autosomal_dominant` analysis.
 First - here's some quick points on SQL and examples on how to use SQL queries. 
 
 In SQL, information is stored in tables, much like a sheet within a Microsoft Excel Spreadsheet file.
-You can ask the database to give you specific, tabular information and also put restrictions on the type of information that is needed (such as a conditional like "the sex of the person must be female").
+You can ask the database to give you specific, tabular information and also put restrictions on the type of information that you are requesting (such as a conditional like "the sex of the person must be female").
 
 If you are interested, you can find a lot more info on [standard SQL commands](https://www.codecademy.com/articles/sql-commands).
 
@@ -140,9 +140,9 @@ Note: Depending on the data type, you may need to surround character info in ''.
 ---
 
 #### Build your query
-Now that we known the query structure and tables that we have in our database, construct some more sophisticated queries.
-1. Extract the chromosome and position of all variants in the database ("FROM variants") that have a 1000 genome allele frequency in Europeans (aaf_1kg_eur) less than 0.5. How many are there?
-2. Extract all the variants (chrom, start, end, ref, alt, qual) within the gene MAPK12 that have a variant quality > 200 (you will need an AND statement). How many are there? How many are QUAL > 500?
+Now that we know the query structure and tables that we have in our database, let's construct some more sophisticated queries.
+1. Extract the chromosome and position (SELECT chrom, start) of all variants in the database ("FROM variants") that have a '1000 Genome Project' allele frequency in Europeans (aaf_1kg_eur) less than 0.5 (Hint: the construction is similar to the last example given above) How many are there?
+2. Extract all the variants (chrom, start, end, ref, alt, qual) within the gene MAPK12 that have a variant quality > 200 (you will need an AND statement, again you can take a look example above how that is constructed). How many are there? How many are QUAL > 500?
 3. Extract variant info (chrom, start, end, ref, alt, qual) and genotype (gts) for the rsID rs774794409. You will need to pull the variant where the rs_ids column matches this rsID. Does the trio (mum, dad and son) all carry the same genotype for this variant?
 4. Can you think how could find out which gene that rsID variant is in, just from querying the database?
 
@@ -153,32 +153,40 @@ Now that we known the query structure and tables that we have in our database, c
 <summary>Answers</summary>
 1.<br>
 
-```bash
+<pre><code class="language-bash">
+
 gemini query -q "SELECT chrom, start FROM variants WHERE aaf_1kg_eur < 0.5" trio.trim.vep.dominant.db | wc -l
-```
+
+</code></pre>
 
 There are 12002<br>
 
 
 2.<br>
 
-```bash
+<pre><code class="language-bash">
+
 gemini query -q "SELECT chrom, start, end, ref, alt, qual FROM variants WHERE gene = 'MAPK12' AND qual > 200" trio.trim.vep.dominant.db | wc -l
-```
+
+</code></pre>
 
 There are 10 with qual > 200
 
-```bash
+<pre><code class="language-bash">
+
 gemini query -q "SELECT chrom, start, end, ref, alt, qual FROM variants WHERE gene = 'MAPK12' AND qual > 500" trio.trim.vep.dominant.db | wc -l
-```
+
+</code></pre>
 
 There are 9 with qual > 500
 
 3.<br>
 
-```bash
+<pre><code class="language-bash">
+
 gemini query -q "SELECT chrom, start, end, ref, alt, qual, gts FROM variants WHERE rs_ids = 'rs774794409'" trio.trim.vep.dominant.db 
-```
+
+</code></pre>
 
 Output:<br>
 
@@ -190,22 +198,24 @@ By chance, all 3 family members carry the same het genotype for this variant!
 
 Yes you can select the gene column from the table:
 
-```bash
+<pre><code class="language-bash">
+
 gemini query -q "SELECT gene FROM variants WHERE rs_ids = 'rs774794409'" trio.trim.vep.dominant.db 
 ```
 
 MAPK12
 
-</details>
+</code></pre>
 
 
 ## **2. Autosomal Dominant disorders**
 
 Autosomal dominant disorders are genetic disorders that do not involve the sex chromosomes and are passed down through families in a vertical transmission pattern. 
-Incomplete penetrance can occur within the family, meaning that disorder may not always show phenotypically.
+Incomplete penetrance can occur within the family, meaning that the disorder may not always show phenotypically.
 `Penetrance` here means "the extent to which a particular gene or set of genes is expressed in the phenotypes of individuals carrying it, measured by the proportion of carriers showing the characteristic phenotype."
 
 ![https://www.mayoclinic.org/autosomal-dominant-inheritance-pattern/img-20006210](https://www.mayoclinic.org/-/media/kcms/gbs/patient-consumer/images/2013/11/15/17/37/r7_autosomaldominantthu_jpg.jpg)
+
 
 Examples of these disorders include Huntington disease, neurofibromatosis, and polycystic kidney disease, and there are many more.
 
@@ -310,11 +320,13 @@ Can you figure out how many variants have an autosomal dominant inheritance patt
 Yes, we can count the lines and find the number of variants is 1541:<br>
 
 
-```bash
+<pre><code class="language-bash">
+
 gemini autosomal_dominant \
     --columns "chrom, start, end, ref, alt, gene, impact, cadd_raw" \
     trio.trim.vep.dominant.db | tail -n +2 | wc -l
-```
+
+</code></pre>
 
 </details>
 
@@ -356,38 +368,43 @@ Now we have gotten down to 1303 variants!
 <summary>Answers</summary>
 1.<br>
 
-```bash
+<pre><code class="language-bash">
+
 gemini autosomal_dominant \
  --columns "chrom, start, end, ref, alt, gene, impact, cadd_raw" \
  --filter "filter is NULL and impact_severity != 'LOW'" \
 trio.trim.vep.dominant.db \
 | tail -n +2 | wc -l
 
-```
+</code></pre>
 
 Number of variants is now 338<br>
 
 2.
-```bash
+<pre><code class="language-bash">
+
  gemini autosomal_dominant \
  --columns "chrom, start, end, ref, alt, gene, impact, cadd_raw" \
  --filter "filter is NULL and impact_severity == 'HIGH' and aaf_esp_ea < 0.01 and aaf_exac_all < 0.01" \
 trio.trim.vep.dominant.db \
 | tail -n +2 | wc -l
-```
+
+</code></pre>
 
 We get down to 2! Yay!<br>
 
 
 3. The output from gemini gives us the following:<br>
 
-```bash
+<pre><code class="language-bash">
+
  gemini autosomal_dominant \
  --columns "chrom, start, end, ref, alt, gene, impact, cadd_raw" \
  --filter "filter is NULL and impact_severity == 'HIGH' and aaf_esp_ea < 0.01 and aaf_exac_all < 0.01" \
 trio.trim.vep.dominant.db
-```
-<br>
+
+</code></pre>
+
 | chrom | start | end | ref | alt | gene | impact | cadd_raw | variant_id | family_id | family_members | family_genotypes | samples | family_count |
 |---|---:|---:|---|---|---|---|---|---:|---|---|---|---|---:|
 | chr2 | 21236250 | 21236251 | G | A | APOB | stop_gained | None | 492 | family1 | 1805(1805;affected;female),1847(1847;unaffected;male),4805(4805;affected;male) | G/A,G/G,G/A | 1805,4805 | 1 |
