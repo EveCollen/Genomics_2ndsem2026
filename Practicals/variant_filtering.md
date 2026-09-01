@@ -141,8 +141,8 @@ Note: Depending on the data type, you may need to surround character info in ''.
 
 #### Build your query
 Now that we know the query structure and tables that we have in our database, let's construct some more sophisticated queries.
-1. Extract the chromosome and position (SELECT chrom, start) of all variants in the database ("FROM variants") that have a 1000 genome allele frequency in Europeans (aaf_1kg_eur) less than 0.5 (Hint: the construction is similar to the last example given above) How many are there?
-2. Extract all the variants (chrom, start, end, ref, alt, qual) within the gene MAPK12 that have a variant quality > 200 (you will need an AND statement). How many are there? How many are QUAL > 500?
+1. Extract the chromosome and position (SELECT chrom, start) of all variants in the database ("FROM variants") that have a '1000 Genome Project' allele frequency in Europeans (aaf_1kg_eur) less than 0.5 (Hint: the construction is similar to the last example given above) How many are there?
+2. Extract all the variants (chrom, start, end, ref, alt, qual) within the gene MAPK12 that have a variant quality > 200 (you will need an AND statement, again you can take a look example above how that is constructed). How many are there? How many are QUAL > 500?
 3. Extract variant info (chrom, start, end, ref, alt, qual) and genotype (gts) for the rsID rs774794409. You will need to pull the variant where the rs_ids column matches this rsID. Does the trio (mum, dad and son) all carry the same genotype for this variant?
 4. Can you think how could find out which gene that rsID variant is in, just from querying the database?
 
@@ -164,23 +164,29 @@ There are 12002<br>
 
 2.<br>
 
-```bash
+<pre><code class="language-bash">
+
 gemini query -q "SELECT chrom, start, end, ref, alt, qual FROM variants WHERE gene = 'MAPK12' AND qual > 200" trio.trim.vep.dominant.db | wc -l
-```
+
+</code></pre>
 
 There are 10 with qual > 200
 
-```bash
+<pre><code class="language-bash">
+
 gemini query -q "SELECT chrom, start, end, ref, alt, qual FROM variants WHERE gene = 'MAPK12' AND qual > 500" trio.trim.vep.dominant.db | wc -l
-```
+
+</code></pre>
 
 There are 9 with qual > 500
 
 3.<br>
 
-```bash
+<pre><code class="language-bash">
+
 gemini query -q "SELECT chrom, start, end, ref, alt, qual, gts FROM variants WHERE rs_ids = 'rs774794409'" trio.trim.vep.dominant.db 
-```
+
+</code></pre>
 
 Output:<br>
 
@@ -192,22 +198,24 @@ By chance, all 3 family members carry the same het genotype for this variant!
 
 Yes you can select the gene column from the table:
 
-```bash
+<pre><code class="language-bash">
+
 gemini query -q "SELECT gene FROM variants WHERE rs_ids = 'rs774794409'" trio.trim.vep.dominant.db 
 ```
 
 MAPK12
 
-</details>
+</code></pre>
 
 
 ## **2. Autosomal Dominant disorders**
 
 Autosomal dominant disorders are genetic disorders that do not involve the sex chromosomes and are passed down through families in a vertical transmission pattern. 
-Incomplete penetrance can occur within the family, meaning that disorder may not always show phenotypically.
+Incomplete penetrance can occur within the family, meaning that the disorder may not always show phenotypically.
 `Penetrance` here means "the extent to which a particular gene or set of genes is expressed in the phenotypes of individuals carrying it, measured by the proportion of carriers showing the characteristic phenotype."
 
 ![https://www.mayoclinic.org/autosomal-dominant-inheritance-pattern/img-20006210](https://www.mayoclinic.org/-/media/kcms/gbs/patient-consumer/images/2013/11/15/17/37/r7_autosomaldominantthu_jpg.jpg)
+
 
 Examples of these disorders include Huntington disease, neurofibromatosis, and polycystic kidney disease, and there are many more.
 
@@ -312,11 +320,13 @@ Can you figure out how many variants have an autosomal dominant inheritance patt
 Yes, we can count the lines and find the number of variants is 1541:<br>
 
 
-```bash
+<pre><code class="language-bash">
+
 gemini autosomal_dominant \
     --columns "chrom, start, end, ref, alt, gene, impact, cadd_raw" \
     trio.trim.vep.dominant.db | tail -n +2 | wc -l
-```
+
+</code></pre>
 
 </details>
 
@@ -358,38 +368,43 @@ Now we have gotten down to 1303 variants!
 <summary>Answers</summary>
 1.<br>
 
-```bash
+<pre><code class="language-bash">
+
 gemini autosomal_dominant \
  --columns "chrom, start, end, ref, alt, gene, impact, cadd_raw" \
  --filter "filter is NULL and impact_severity != 'LOW'" \
 trio.trim.vep.dominant.db \
 | tail -n +2 | wc -l
 
-```
+</code></pre>
 
 Number of variants is now 338<br>
 
 2.
-```bash
+<pre><code class="language-bash">
+
  gemini autosomal_dominant \
  --columns "chrom, start, end, ref, alt, gene, impact, cadd_raw" \
  --filter "filter is NULL and impact_severity == 'HIGH' and aaf_esp_ea < 0.01 and aaf_exac_all < 0.01" \
 trio.trim.vep.dominant.db \
 | tail -n +2 | wc -l
-```
+
+</code></pre>
 
 We get down to 2! Yay!<br>
 
 
 3. The output from gemini gives us the following:<br>
 
-```bash
+<pre><code class="language-bash">
+
  gemini autosomal_dominant \
  --columns "chrom, start, end, ref, alt, gene, impact, cadd_raw" \
  --filter "filter is NULL and impact_severity == 'HIGH' and aaf_esp_ea < 0.01 and aaf_exac_all < 0.01" \
 trio.trim.vep.dominant.db
-```
-<br>
+
+</code></pre>
+
 | chrom | start | end | ref | alt | gene | impact | cadd_raw | variant_id | family_id | family_members | family_genotypes | samples | family_count |
 |---|---:|---:|---|---|---|---|---|---:|---|---|---|---|---:|
 | chr2 | 21236250 | 21236251 | G | A | APOB | stop_gained | None | 492 | family1 | 1805(1805;affected;female),1847(1847;unaffected;male),4805(4805;affected;male) | G/A,G/G,G/A | 1805,4805 | 1 |
